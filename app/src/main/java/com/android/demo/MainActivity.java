@@ -110,12 +110,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        recyclerView.addOnScrollListener(new OnRecyclerViewScroller(mLinearLayoutManager) {
-            @Override
-            public void onLoadMore() {
-                Log.e(TAG, "onLoadMore()");
-            }
-        });
+//        recyclerView.addOnScrollListener(new OnRecyclerViewScroller(mLinearLayoutManager) {
+//            @Override
+//            public void onLoadMore() {
+//                Log.e(TAG, "onLoadMore()");
+//            }
+//        });
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
