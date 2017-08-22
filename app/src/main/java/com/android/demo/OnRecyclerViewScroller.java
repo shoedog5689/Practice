@@ -1,7 +1,9 @@
 package com.android.demo;
 
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by hewei on 2017/8/21.
@@ -16,6 +18,7 @@ public abstract class OnRecyclerViewScroller extends RecyclerView.OnScrollListen
     private int visibleCount;  //屏幕可见数据量
 
     private boolean scrollState = false; //是否滚动
+    private boolean canLoad = true;
 
     /**
      * 提供一个抽闲方法，在Activity中监听到这个EndLessOnScrollListener
@@ -24,19 +27,32 @@ public abstract class OnRecyclerViewScroller extends RecyclerView.OnScrollListen
     public abstract void onLoadMore();
 
     @Override
-    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+    public void onScrolled(final RecyclerView recyclerView, int dx, int dy) {
         super.onScrolled(recyclerView, dx, dy);
 
         visibleCount = recyclerView.getChildCount();
         totalCount = mLayoutManager.getItemCount();
-        int lastVisibleItem = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition();
 
+//        int lastVisibleItem = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition();
 //        if (lastVisibleItem >= totalCount - 4 && dy > 0) {
 //            onLoadMore();
 //        }
 
-        if (!recyclerView.canScrollVertically(1)) { //滚动到底部
-            onLoadMore();
+        if (!recyclerView.canScrollVertically(1) && canLoad) { //滚动到底部
+            TimerTask timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    recyclerView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            onLoadMore();
+                        }
+                    });
+                }
+            };
+            Timer timer = new Timer();
+            timer.schedule(timerTask, 2000);
+            canLoad = false;
         }
     }
 

@@ -110,12 +110,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        recyclerView.addOnScrollListener(new OnRecyclerViewScroller(mLinearLayoutManager) {
-//            @Override
-//            public void onLoadMore() {
-//                Log.e(TAG, "onLoadMore()");
-//            }
-//        });
+        recyclerView.addOnScrollListener(new OnRecyclerViewScroller(mLinearLayoutManager) {
+            @Override
+            public void onLoadMore() {
+                Log.e(TAG, "onLoadMore()");
+
+                /**
+                 * 加载更多时候，先ItemInsert一个loading item，加载成功后再去除，然后刷新adapter
+                 */
+                View loadingView = getLayoutInflater().inflate(R.layout.loading_view, (ViewGroup) recyclerView.getParent(), false);
+                adapter.addLoadingItem(loadingView);
+            }
+        });
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
