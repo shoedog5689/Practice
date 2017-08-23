@@ -23,15 +23,19 @@ public abstract class OnRecyclerViewScroller extends RecyclerView.OnScrollListen
     /**
      * 提供一个抽闲方法，在Activity中监听到这个EndLessOnScrollListener
      * 并且实现这个方法
-     * */
+     */
     public abstract void onLoadMore();
+
+    public void setCanLoad(boolean canLoad) {
+        this.canLoad = canLoad;
+    }
 
     @Override
     public void onScrolled(final RecyclerView recyclerView, int dx, int dy) {
         super.onScrolled(recyclerView, dx, dy);
 
-        visibleCount = recyclerView.getChildCount();
-        totalCount = mLayoutManager.getItemCount();
+//        visibleCount = recyclerView.getChildCount();
+//        totalCount = mLayoutManager.getItemCount();
 
 //        int lastVisibleItem = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition();
 //        if (lastVisibleItem >= totalCount - 4 && dy > 0) {
@@ -39,20 +43,7 @@ public abstract class OnRecyclerViewScroller extends RecyclerView.OnScrollListen
 //        }
 
         if (!recyclerView.canScrollVertically(1) && canLoad) { //滚动到底部
-            TimerTask timerTask = new TimerTask() {
-                @Override
-                public void run() {
-                    recyclerView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            onLoadMore();
-                        }
-                    });
-                }
-            };
-            Timer timer = new Timer();
-            timer.schedule(timerTask, 2000);
-            canLoad = false;
+            onLoadMore();
         }
     }
 
@@ -76,7 +67,6 @@ public abstract class OnRecyclerViewScroller extends RecyclerView.OnScrollListen
     public OnRecyclerViewScroller(RecyclerView.LayoutManager layoutManager) {
         this.mLayoutManager = layoutManager;
     }
-
 
 
 }

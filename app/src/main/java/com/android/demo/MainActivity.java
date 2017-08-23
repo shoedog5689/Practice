@@ -80,10 +80,6 @@ public class MainActivity extends AppCompatActivity {
         return list;
     }
 
-//    public void setData(List list) {
-//        adapter.setData(list);
-//    }
-
     private void setListener() {
         //swipeRefreshLayout刷新监听
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -115,11 +111,34 @@ public class MainActivity extends AppCompatActivity {
             public void onLoadMore() {
                 Log.e(TAG, "onLoadMore()");
 
+                setCanLoad(false);
+
                 /**
                  * 加载更多时候，先ItemInsert一个loading item，加载成功后再去除，然后刷新adapter
                  */
-                View loadingView = getLayoutInflater().inflate(R.layout.loading_view, (ViewGroup) recyclerView.getParent(), false);
-                adapter.addLoadingItem(loadingView);
+                final View loadingView = getLayoutInflater().inflate(R.layout.loading_view, (ViewGroup) recyclerView.getParent(), false);
+                recyclerView.post(new Runnable() {  // Avoid warning when update while measure.
+                    public void run() {
+                        adapter.addLoadingItem(loadingView);
+//                        recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);  //自动弹出底部加载框
+                    }
+                });
+
+                TimerTask timerTask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        recyclerView.post(new Runnable() {
+                            @Override
+                            public void run() {  //两秒后删除loading item
+                                adapter.removeLoadingItem();
+                                adapter.updateData();
+                                setCanLoad(true);   //设置可以Loading
+                            }
+                        });
+                    }
+                };
+                Timer timer = new Timer();
+                timer.schedule(timerTask, 2000);
             }
         });
     }

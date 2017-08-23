@@ -28,7 +28,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private LinearLayout mHeaderLayout;
     private LinearLayout mLoadingLayout;
 
-    public static enum ITEM_TYPE {
+    public enum ITEM_TYPE {
         NORMAL,
         LOADING
     }
@@ -56,7 +56,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             // set the view's size, margins, paddings and layout parameters
             MyViewHolder vh = new MyViewHolder(v);
             return vh;
-        }else if (viewType == ITEM_TYPE.LOADING.ordinal()) {
+        } else if (viewType == ITEM_TYPE.LOADING.ordinal()) {
             // set the view's size, margins, paddings and layout parameters
             LoadingViewHolder vh = new LoadingViewHolder(mLoadingLayout);
             return vh;
@@ -69,7 +69,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         if (holder instanceof MyViewHolder) {
             ((MyViewHolder) holder).indexTv.setText("设置" + position);
             ((MyViewHolder) holder).contentTv.setText("测试" + position);
-        }else if (holder instanceof LoadingViewHolder) {
+        } else if (holder instanceof LoadingViewHolder) {
             ((LoadingViewHolder) holder).loadingTv.setText("看好了！！哒哒哒哒哒哒...");
         }
     }
@@ -80,7 +80,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         if (mLoadingLayout != null) {  //存在Loading View Item
             if (position == getItemCount() - 1) {
                 return ITEM_TYPE.LOADING.ordinal();
-            }else {
+            } else {
                 return ITEM_TYPE.NORMAL.ordinal();
             }
         }
@@ -127,6 +127,24 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     public void removeLoadingItem() {
         Log.d(TAG, "removeLoadingItem()");
+
+        if (mLoadingLayout != null) {  //Loading Item存在
+            int loadingPosition = getItemCount() - 1;
+            if (loadingPosition > 0) {
+                notifyItemRemoved(loadingPosition);
+                mLoadingLayout = null;
+            }
+        }
+    }
+
+    public void updateData() {
+        List tmpList = new ArrayList();
+        for (int i=0; i<10; i++) {
+            tmpList.add(i);
+        }
+        list.addAll(tmpList);
+
+        notifyDataSetChanged();
     }
 
     private static class MyViewHolder extends RecyclerView.ViewHolder {
