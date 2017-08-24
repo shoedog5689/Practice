@@ -157,9 +157,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         public MyViewHolder(View itemView) {
             super(itemView);
 
-            cardView = itemView.findViewById(R.id.card_view);
-            indexTv = itemView.findViewById(R.id.index);
-            contentTv = itemView.findViewById(R.id.re_content);
+            cardView = (CardView) itemView.findViewById(R.id.card_view);
+            indexTv = (TextView) itemView.findViewById(R.id.index);
+            contentTv = (TextView) itemView.findViewById(R.id.re_content);
         }
     }
 
@@ -168,7 +168,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         public LoadingViewHolder(View itemView) {
             super(itemView);
-            loadingTv = itemView.findViewById(R.id.loading_tv);
+            loadingTv = (TextView) itemView.findViewById(R.id.loading_tv);
         }
     }
 }
