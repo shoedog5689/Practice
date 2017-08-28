@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
 //                View headView = getLayoutInflater().inflate(R.layout.header_view, (ViewGroup) recyclerView.getParent(), false);
 //                adapter.addHeader(headView);
 
-                Intent i = new Intent(MainActivity.this, SecondActivity.class);
+                Intent i = new Intent(MainActivity.this, EditActivity.class);
                 startActivity(i);
             }
         });
