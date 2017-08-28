@@ -1,9 +1,6 @@
 package com.android.demo;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -17,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.android.demo.view.custom.CircleButton;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -26,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private final String TAG = MainActivity.class.getSimpleName();
 
     private TextView mTextMessage;
+    private CircleButton mCircleButton;
 
     private RecyclerView recyclerView;
     private LinearLayoutManager mLinearLayoutManager;
@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mCircleButton = (CircleButton) findViewById(R.id.button);
 
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
     public List getData() {
         List list = new ArrayList();
-        for (int i=0; i<10; i++) {
+        for (int i = 0; i < 10; i++) {
             list.add(i);
         }
         return list;
@@ -105,8 +107,30 @@ public class MainActivity extends AppCompatActivity {
 //                View headView = getLayoutInflater().inflate(R.layout.header_view, (ViewGroup) recyclerView.getParent(), false);
 //                adapter.addHeader(headView);
 
-                Intent i = new Intent(MainActivity.this, EditActivity.class);
-                startActivity(i);
+//                Intent i = new Intent(MainActivity.this, EditActivity.class);
+//                startActivity(i);
+
+//                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//                builder.setTitle("转啊转啊转");
+//                builder.setMessage("这是 android.support.v7.app.AlertDialog 中的样式");
+//                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        Log.d(TAG, "");
+//                    }
+//                });
+//                AlertDialog dialog = builder.create();
+//                Window dialogWindow = dialog.getWindow();
+//                dialog.show();
+
+
+            }
+        });
+
+        mCircleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCircleButton.startAnimationInOrder();
             }
         });
 
