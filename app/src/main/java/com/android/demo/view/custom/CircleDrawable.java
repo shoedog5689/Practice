@@ -1,7 +1,6 @@
 package com.android.demo.view.custom;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -23,10 +22,10 @@ public class CircleDrawable extends Drawable {
     private RectF mRectF;
     private int mOffset;
 
-    public CircleDrawable() {
+    public CircleDrawable(int color) {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
-        mPaint.setColor(Color.BLUE);
+        mPaint.setColor(color);
     }
 
     @Override
@@ -65,5 +64,9 @@ public class CircleDrawable extends Drawable {
     public void setRadius(float radius) {
         this.mRadius = radius;
         invalidateSelf();
+    }
+
+    public void drawComplete() {
+
     }
 }

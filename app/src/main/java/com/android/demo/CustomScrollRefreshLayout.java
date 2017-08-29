@@ -21,26 +21,41 @@ public class CustomScrollRefreshLayout extends ViewGroup {
 
     private LinearLayout mHeaderLayout;
     private VelocityTracker mVelocityTracker;
-    private float actionX, actionY;
     private int touchSlop;
 
-    private int maxHeight;
-    private int totalLayoutHeight;
+    private float headerViewHeight;
+    private float yOffset; //Y轴偏移量
+    float actionX = 0;
+    float actionY = 0;
 
     public CustomScrollRefreshLayout(Context context) {
         super(context);
+        addHeaderView();
     }
 
     public CustomScrollRefreshLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+        addHeaderView();
     }
 
     public CustomScrollRefreshLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        addHeaderView();
     }
 
-    public CustomScrollRefreshLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+    private void addHeaderView() {
+        //初始化顶部不可见的HeaderView
+        headerViewHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100f, getContext().getResources().getDisplayMetrics());  //默认100dp高度
+        if (mHeaderLayout == null) {
+            mHeaderLayout = (LinearLayout) LayoutInflater.from(getContext()).inflate(R.layout.header_view, this, false);
+            ViewGroup.LayoutParams lp = mHeaderLayout.getLayoutParams();
+            if (lp == null) {
+                lp = new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, (int) headerViewHeight);
+            }
+//            mHeaderLayout.setY(-headerViewHeight);  //设置初始位置，不可见
+            addView(mHeaderLayout, 0, lp);  //添加到布局中，但其实此时不可见
+            mHeaderLayout.bringToFront();  //改变在同一层级的控件中的z轴的顺序，放到最上层
+        }
     }
 
     @Override
@@ -57,22 +72,10 @@ public class CustomScrollRefreshLayout extends ViewGroup {
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
         touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
-        maxHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100f, getContext().getResources().getDisplayMetrics());
 
         Log.d(TAG, "childCount:" + getChildCount());
 
         measureChildren(widthMeasureSpec, heightMeasureSpec);
-
-        /**
-         * 记录如果是wrap_content时设置的宽和高
-         */
-        int width = 0;
-        int height = 0;
-
-        int cCount = getChildCount();
-
-        int cWidth = 0;
-        int cHeight = 0;
 
         //如果没有子元素，就设置宽高都为0（简化处理）
         if (getChildCount() == 0) {
@@ -102,15 +105,27 @@ public class CustomScrollRefreshLayout extends ViewGroup {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         int childCount = getChildCount();
-        int totalHeight = 0;
+        Log.d(TAG, "onLayout() >> childCount:" + childCount);
+        float totalVisibleHeight = 0; //除了headerView外的可视View的高度
         View child;
         for (int i = 0; i < childCount; i++) {
             child = getChildAt(i);
             if (child.getVisibility() != View.GONE) {
                 int width = child.getMeasuredWidth();
-                int height = child.getMeasuredHeight();
-                child.layout(0, totalHeight, width, totalHeight + height);
-                totalHeight += height;
+                if (mHeaderLayout == null) {
+                    addHeaderView();
+                }
+                if (child.getId() != mHeaderLayout.getId()) {
+                    int height = child.getMeasuredHeight();
+                    //可视高度加上Y轴偏移量来确定ViewGroup的位置
+                    Log.d(TAG, "onLayout() >> totalVisibleHeight:" + totalVisibleHeight + ", yOffset:" + yOffset);
+                    child.layout(0, (int) (totalVisibleHeight + yOffset), width, (int) (totalVisibleHeight + height + yOffset));
+                    totalVisibleHeight += height;
+                }else {
+                    Log.d(TAG, "onLayout() >> header view measured height:" + mHeaderLayout.getMeasuredHeight());
+//                    child.layout(0, 0, width, (int) yOffset);  //仅布局一部分的方式
+                    child.layout(0, (int) (yOffset - mHeaderLayout.getMeasuredHeight()), width, (int) yOffset);  //初始布局在顶部，随手势下移
+                }
             }
         }
     }
@@ -142,17 +157,6 @@ public class CustomScrollRefreshLayout extends ViewGroup {
                 Log.d(TAG, "onTouchEvent() >> ACTION_DOWN");
                 actionX = event.getX();  //初始位置
                 actionY = event.getY();
-                if (mHeaderLayout == null) {
-                    mHeaderLayout = (LinearLayout) LayoutInflater.from(getContext()).inflate(R.layout.header_view, this, false);
-                    ViewGroup.LayoutParams lp = mHeaderLayout.getLayoutParams();
-                    if (lp == null) {
-                        lp = new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, maxHeight);
-                    }
-                    mHeaderLayout.setY(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, -maxHeight, getResources().getDisplayMetrics()));  //设置初始位置，不可见
-                    Log.d(TAG, "ACTION_DOWN >> addView()");
-                    addView(mHeaderLayout, 0, lp);  //添加到布局中，但其实此时不可见
-                    mHeaderLayout.bringToFront();  //改变在同一层级的控件中的z轴的顺序，放到最上层
-                }
                 break;
             case MotionEvent.ACTION_MOVE:
                 xVelocity = mVelocityTracker.getXVelocity();
@@ -160,17 +164,23 @@ public class CustomScrollRefreshLayout extends ViewGroup {
                 Log.d(TAG, "onTouchEvent() >> ACTION_MOVE, xVelocity:" + xVelocity + ", yVelocity:" + yVelocity);
 
                 if (xVelocity < yVelocity) {  //说明是上下滑动的手势
-                    float offsetY = event.getY() - actionY;
-                    if (offsetY > touchSlop) {  //超过系统设定距离，为滑动手势
+                    yOffset = event.getY() - actionY;
+                    if (Math.abs(yOffset) > touchSlop) {  //超过系统设定距离，为滑动手势
                         if (mHeaderLayout != null) {
-                            mHeaderLayout.setY(offsetY);
+                            requestLayout();  //刷新
+                            invalidate();
                         }
                     }
                 }
                 break;
             case MotionEvent.ACTION_UP:
+                Log.d(TAG, "onTouchEvent() >> ACTION_UP");
+                //松开手指后
+
+
                 break;
             case MotionEvent.ACTION_CANCEL:
+                Log.d(TAG, "onTouchEvent() >> ACTION_CANCEL");
                 break;
         }
         return true;

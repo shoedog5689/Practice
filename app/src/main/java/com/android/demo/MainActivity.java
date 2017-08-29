@@ -1,5 +1,6 @@
 package com.android.demo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -106,6 +107,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "mTextMessage onClick()");
 //                View headView = getLayoutInflater().inflate(R.layout.header_view, (ViewGroup) recyclerView.getParent(), false);
 //                adapter.addHeader(headView);
+
+                Intent i = new Intent(MainActivity.this, SecondActivity.class);
+                startActivity(i);
 
 //                Intent i = new Intent(MainActivity.this, EditActivity.class);
 //                startActivity(i);
