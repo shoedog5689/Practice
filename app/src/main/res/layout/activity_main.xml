@@ -8,8 +8,21 @@
     android:orientation="vertical"
     tools:context="com.android.demo.MainActivity">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:background="@color/toolbar_color"
+        android:fitsSystemWindows="true"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        app:title="">
+
+        <include layout="@layout/toolbar_view" />
+
+    </android.support.v7.widget.Toolbar>
+
     <LinearLayout
         android:id="@+id/content"
+        android:layout_below="@+id/toolbar"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

@@ -8,6 +8,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MenuItem;
@@ -25,25 +26,56 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity {
     private final String TAG = MainActivity.class.getSimpleName();
 
+    private Toolbar mToolbar;
     private TextView mTextMessage;
     private CircleButton mCircleButton;
-
     private RecyclerView recyclerView;
     private LinearLayoutManager mLinearLayoutManager;
     private SwipeRefreshLayout swipeRefreshLayout;
     private MyRecyclerViewAdapter adapter;
+    private BottomNavigationView navigation;
+
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    mTextMessage.setText(R.string.title_home);
+                    return true;
+                case R.id.navigation_dashboard:
+                    mTextMessage.setText(R.string.title_dashboard);
+                    return true;
+                case R.id.navigation_notifications:
+                    mTextMessage.setText(R.string.title_notifications);
+                    return true;
+            }
+            return false;
+        }
+
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initView();
+        setListener();
+    }
+
+    private void initView() {
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        //设置支持Toolbar
+        setSupportActionBar(mToolbar);
+        //隐藏标题栏
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        //设置toolabar //设置导航图标一定要设置在setsupportactionbar后面才有用不然他会显示小箭头
+
         mCircleButton = (CircleButton) findViewById(R.id.button);
-
         mTextMessage = (TextView) findViewById(R.id.message);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
+        navigation = (BottomNavigationView) findViewById(R.id.navigation);
         //RecyclerView
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         /**
@@ -54,37 +86,18 @@ public class MainActivity extends AppCompatActivity {
         //set LayoutManager
         mLinearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(mLinearLayoutManager);
-
         //set Adapter
         adapter = new MyRecyclerViewAdapter(getData(), this);
         recyclerView.setAdapter(adapter);
-
         //SwipeRefreshLayout
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.grid_swipe_refresh);
         //调整SwipeRefreshLayout的位置
         swipeRefreshLayout.setProgressViewOffset(false, 0, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
-
-        setListener();
-    }
-
-    private void setSwipeRefreshing(final boolean status) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                swipeRefreshLayout.setRefreshing(status);
-            }
-        });
-    }
-
-    public List getData() {
-        List list = new ArrayList();
-        for (int i = 0; i < 10; i++) {
-            list.add(i);
-        }
-        return list;
     }
 
     private void setListener() {
+        //底部导航栏的事件监听
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         //swipeRefreshLayout刷新监听
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -108,11 +121,14 @@ public class MainActivity extends AppCompatActivity {
 //                View headView = getLayoutInflater().inflate(R.layout.header_view, (ViewGroup) recyclerView.getParent(), false);
 //                adapter.addHeader(headView);
 
-                Intent i = new Intent(MainActivity.this, SecondActivity.class);
-                startActivity(i);
+//                Intent i = new Intent(MainActivity.this, SecondActivity.class);
+//                startActivity(i);
 
 //                Intent i = new Intent(MainActivity.this, EditActivity.class);
 //                startActivity(i);
+
+                Intent i = new Intent(MainActivity.this, DialogActivity.class);
+                startActivity(i);
 
 //                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 //                builder.setTitle("转啊转啊转");
@@ -175,25 +191,20 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
-                    return true;
-                case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
-                    return true;
-                case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
-                    return true;
+    private void setSwipeRefreshing(final boolean status) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(status);
             }
-            return false;
+        });
+    }
+
+    public List getData() {
+        List list = new ArrayList();
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
         }
-
-    };
-
+        return list;
+    }
 }

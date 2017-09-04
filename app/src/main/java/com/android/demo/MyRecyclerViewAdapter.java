@@ -67,7 +67,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof MyViewHolder) {
-            ((MyViewHolder) holder).indexTv.setText("设置" + position);
+            ((MyViewHolder) holder).indexTv.setText("toolbar_settings" + position);
             ((MyViewHolder) holder).contentTv.setText("测试" + position);
         } else if (holder instanceof LoadingViewHolder) {
             ((LoadingViewHolder) holder).loadingTv.setText("看好了！！哒哒哒哒哒哒...");
