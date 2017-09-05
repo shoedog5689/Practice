@@ -1,4 +1,4 @@
-package com.android.demo;
+package com.android.demo.view.custom;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+
+import com.android.demo.R;
 
 /**
  * Created by hewei on 2017/8/23.

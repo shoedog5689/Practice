@@ -1,9 +1,6 @@
-package com.android.demo;
+package com.android.demo.view.callback;
 
 import android.support.v7.widget.RecyclerView;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by hewei on 2017/8/21.

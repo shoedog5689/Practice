@@ -1,4 +1,4 @@
-package com.android.demo;
+package com.android.demo.view.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.CardView;
@@ -8,12 +8,12 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.android.demo.R;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**

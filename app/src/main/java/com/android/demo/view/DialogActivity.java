@@ -1,4 +1,4 @@
-package com.android.demo;
+package com.android.demo.view;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,6 +9,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.Button;
+
+import com.android.demo.view.adapter.MyPagerAdapter;
+import com.android.demo.R;
+import com.android.demo.view.fragment.Tab1Fragment;
+import com.android.demo.view.fragment.Tab2Fragment;
 
 import java.util.ArrayList;
 import java.util.List;

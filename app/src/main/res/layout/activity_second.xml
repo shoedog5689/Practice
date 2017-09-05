@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.android.demo.CustomScrollRefreshLayout
+    <com.android.demo.view.custom.CustomScrollRefreshLayout
         android:id="@+id/custom_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -17,6 +17,6 @@
             android:gravity="center"
             android:text="拖动这里下滑......"/>
 
-    </com.android.demo.CustomScrollRefreshLayout>
+    </com.android.demo.view.custom.CustomScrollRefreshLayout>
 
 </LinearLayout>

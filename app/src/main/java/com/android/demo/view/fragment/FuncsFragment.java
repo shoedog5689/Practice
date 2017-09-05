@@ -1,23 +1,22 @@
-package com.android.demo;
+package com.android.demo.view.fragment;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * Created by hewei on 2017/9/4.
+ * Created by hewei on 2017/9/5.
  */
 
-public class Tab2Fragment extends Fragment {
+public class FuncsFragment extends Fragment {
+    private static final String TAG = FuncsFragment.class.getSimpleName();
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.tab_2_fragment, container, false);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
-
-
 }
