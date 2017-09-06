@@ -5,14 +5,19 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
 import com.android.demo.R;
+import com.android.demo.util.FragmentUtils;
 import com.android.demo.view.fragment.FuncsFragment;
 import com.android.demo.view.fragment.InfoListFragment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private final String TAG = MainActivity.class.getSimpleName();
@@ -21,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
 //    private TextView mTextMessage;
 //    private CircleButton mCircleButton;
     private BottomNavigationView navigation;
-    private InfoListFragment mInfoListFragment;
+    private List<Fragment> fragmentList = new ArrayList<>();
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -32,27 +37,10 @@ public class MainActivity extends AppCompatActivity {
             final FragmentTransaction fTransaction = fm.beginTransaction();
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    if (mInfoListFragment == null) {
-                        mInfoListFragment = new InfoListFragment();
-                        fTransaction.add(R.id.main_frame_layout, mInfoListFragment,
-                                InfoListFragment.class.getSimpleName()).commit();
-                    }else {
-                        if (mInfoListFragment.isHidden()) {
-                            fTransaction.show(mInfoListFragment).commit();
-                        }
-                    }
-//                    if (!mInfoListFragment.isAdded()) {
-//
-//                    }
+                    FragmentUtils.hideAllShowFragment(fragmentList.get(0));
                     return true;
                 case R.id.navigation_dashboard:
-                    if (mInfoListFragment != null) {
-                        if (mInfoListFragment.isAdded() && mInfoListFragment.isVisible()) {
-                            Log.e(TAG, "isVisible():" + mInfoListFragment.isVisible());
-                            getFragmentManager().beginTransaction().hide(mInfoListFragment).commit();
-                        }
-                    }
-                    FuncsFragment funcsFragment = new FuncsFragment();
+                    FragmentUtils.hideAllShowFragment(fragmentList.get(1));
                     return true;
                 case R.id.navigation_notifications:
                     return true;
@@ -69,6 +57,30 @@ public class MainActivity extends AppCompatActivity {
 
         initView();
         setListener();
+        initFirstFragment();
+    }
+
+    private void initFirstFragment() {
+        if (fragmentList == null) {
+            fragmentList = new ArrayList<>();
+        }
+        //第一个fragment这里设置为InfoListFragment
+        fragmentList.add((Fragment) new InfoListFragment());
+        fragmentList.add((Fragment) new FuncsFragment());
+        // TODO: 2017/9/6 Add ohter fragments here.
+        if (fragmentList.size() > 0) {
+            if (!fragmentList.get(0).isAdded()) {
+                FragmentUtils.addFragments(getSupportFragmentManager(), fragmentList, R.id.main_frame_layout, 0);
+//                FragmentUtils.addFragment(getSupportFragmentManager(), fragmentList.get(0), R.id.main_frame_layout);
+            }
+        }
+        setNavigationItemSelected(R.id.navigation_home);
+    }
+
+    private void setNavigationItemSelected(int resId) {
+        if (navigation != null) {
+            navigation.setSelectedItemId(resId);
+        }
     }
 
     private void initView() {
