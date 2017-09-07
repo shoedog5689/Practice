@@ -8,13 +8,12 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.android.demo.R;
 import com.android.demo.util.FragmentUtils;
-import com.android.demo.view.fragment.FuncsFragment;
 import com.android.demo.view.fragment.InfoListFragment;
+import com.android.demo.view.fragment.TabsFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,15 +34,17 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             final FragmentManager fm = getFragmentManager();
             final FragmentTransaction fTransaction = fm.beginTransaction();
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    FragmentUtils.hideAllShowFragment(fragmentList.get(0));
-                    return true;
-                case R.id.navigation_dashboard:
-                    FragmentUtils.hideAllShowFragment(fragmentList.get(1));
-                    return true;
-                case R.id.navigation_notifications:
-                    return true;
+            if (navigation.getSelectedItemId() != item.getItemId()) {  //重复点击当前选中项时，不做fragment切换
+                switch (item.getItemId()) {
+                    case R.id.navigation_home:
+                        FragmentUtils.hideAllShowFragment(fragmentList.get(0));
+                        return true;
+                    case R.id.navigation_dashboard:
+                        FragmentUtils.hideAllShowFragment(fragmentList.get(1));
+                        return true;
+                    case R.id.navigation_notifications:
+                        return true;
+                }
             }
             return false;
         }
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         }
         //第一个fragment这里设置为InfoListFragment
         fragmentList.add((Fragment) new InfoListFragment());
-        fragmentList.add((Fragment) new FuncsFragment());
+        fragmentList.add((Fragment) new TabsFragment());
         // TODO: 2017/9/6 Add ohter fragments here.
         if (fragmentList.size() > 0) {
             if (!fragmentList.get(0).isAdded()) {
@@ -113,9 +114,6 @@ public class MainActivity extends AppCompatActivity {
 //
 ////                Intent i = new Intent(MainActivity.this, EditActivity.class);
 ////                startActivity(i);
-//
-//                Intent i = new Intent(MainActivity.this, DialogActivity.class);
-//                startActivity(i);
 //
 ////                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 ////                builder.setTitle("转啊转啊转");

@@ -28,14 +28,15 @@ import java.util.TimerTask;
 public class InfoListFragment extends Fragment {
     private static final String TAG = InfoListFragment.class.getSimpleName();
 
+    private View rootView;
     private RecyclerView recyclerView;
     private LinearLayoutManager mLinearLayoutManager;
     private SwipeRefreshLayout swipeRefreshLayout;
     private MyRecyclerViewAdapter adapter;
 
-    private void initView(final View view) {
+    private void initView() {
         //RecyclerView
-        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         /**
          * use this setting to improve performance if you know that changes
          * in content do not change the layout size of the RecyclerView
@@ -48,7 +49,7 @@ public class InfoListFragment extends Fragment {
         adapter = new MyRecyclerViewAdapter(getData(), getActivity());
         recyclerView.setAdapter(adapter);
         //SwipeRefreshLayout
-        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.grid_swipe_refresh);
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.grid_swipe_refresh);
         //调整SwipeRefreshLayout的位置
         swipeRefreshLayout.setProgressViewOffset(false, 0, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
     }
@@ -128,14 +129,16 @@ public class InfoListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_info_list, container, false);
-        initView(view);
-        initListener();
-        return view;
+        rootView = inflater.inflate(R.layout.fragment_info_list, container, false);
+        return rootView;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        if (rootView != null) {
+            initView();
+            initListener();
+        }
     }
 }
