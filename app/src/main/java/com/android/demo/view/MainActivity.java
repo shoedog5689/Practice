@@ -12,6 +12,7 @@ import android.view.MenuItem;
 
 import com.android.demo.R;
 import com.android.demo.util.FragmentUtils;
+import com.android.demo.util.ShortCutUtils;
 import com.android.demo.view.fragment.InfoListFragment;
 import com.android.demo.view.fragment.TabsFragment;
 
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
                         FragmentUtils.hideAllShowFragment(fragmentList.get(1));
                         return true;
                     case R.id.navigation_notifications:
+                        ShortCutUtils.addShortcut(MainActivity.this, R.drawable.sticky_note);
                         return true;
                 }
             }
@@ -114,21 +116,6 @@ public class MainActivity extends AppCompatActivity {
 //
 ////                Intent i = new Intent(MainActivity.this, EditActivity.class);
 ////                startActivity(i);
-//
-////                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-////                builder.setTitle("转啊转啊转");
-////                builder.setMessage("这是 android.support.v7.app.AlertDialog 中的样式");
-////                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-////                    @Override
-////                    public void onClick(DialogInterface dialog, int which) {
-////                        Log.d(TAG, "");
-////                    }
-////                });
-////                AlertDialog dialog = builder.create();
-////                Window dialogWindow = dialog.getWindow();
-////                dialog.show();
-//
-//
 //            }
 //        });
 //

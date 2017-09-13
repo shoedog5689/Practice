@@ -2,6 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.demo">
 
+    <!-- Android ShortCut Permissions ###START### -->
+    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>
+    <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT"/>
+    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS"/>
+    <uses-permission android:name="com.android.launcher2.permission.READ_SETTINGS"/>
+    <uses-permission android:name="com.android.launcher3.permission.READ_SETTINGS"/>
+    <!-- Android ShortCut Permissions ###END### -->
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -21,7 +29,13 @@
 
         <activity android:name=".view.SecondActivity" />
 
-        <activity android:name=".view.EditActivity" />
+        <activity android:name=".view.EditActivity">>
+            <intent-filter>
+                <action android:name="com.short.cut.action" />
+                <category android:name="com.short.cut.category" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
     </application>
 
