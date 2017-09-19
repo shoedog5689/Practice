@@ -1,7 +1,5 @@
 package com.android.demo.view.fragment;
 
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.android.demo.R;
+import com.android.demo.view.custom.CommonDialogFragment;
 
 /**
  * Created by hewei on 2017/9/4.

@@ -14,6 +14,7 @@ import com.android.demo.R;
 import com.android.demo.util.FragmentUtils;
 import com.android.demo.util.ShortCutUtils;
 import com.android.demo.view.fragment.InfoListFragment;
+import com.android.demo.view.fragment.RefreshFragment;
 import com.android.demo.view.fragment.TabsFragment;
 
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
                         FragmentUtils.hideAllShowFragment(fragmentList.get(1));
                         return true;
                     case R.id.navigation_notifications:
-                        ShortCutUtils.addShortcut(MainActivity.this, R.drawable.sticky_note);
+                        FragmentUtils.hideAllShowFragment(fragmentList.get(2));
                         return true;
                 }
             }
@@ -70,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         //第一个fragment这里设置为InfoListFragment
         fragmentList.add((Fragment) new InfoListFragment());
         fragmentList.add((Fragment) new TabsFragment());
+        fragmentList.add((Fragment) new RefreshFragment());
         // TODO: 2017/9/6 Add ohter fragments here.
         if (fragmentList.size() > 0) {
             if (!fragmentList.get(0).isAdded()) {

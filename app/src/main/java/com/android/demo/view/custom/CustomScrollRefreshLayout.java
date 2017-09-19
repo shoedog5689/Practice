@@ -1,5 +1,7 @@
 package com.android.demo.view.custom;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -23,7 +25,7 @@ public class CustomScrollRefreshLayout extends ViewGroup {
 
     private LinearLayout mHeaderLayout;
     private VelocityTracker mVelocityTracker;
-    private int touchSlop;
+//    private int touchSlop;
 
     private float headerViewHeight;
     private float yOffset; //Y轴偏移量
@@ -64,6 +66,8 @@ public class CustomScrollRefreshLayout extends ViewGroup {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
+        Log.e(TAG, "onMeasure()");
+
         /**
          * 处理WRAP_CONTENT
          */
@@ -73,7 +77,7 @@ public class CustomScrollRefreshLayout extends ViewGroup {
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
-        touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
+//        touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
 
         Log.d(TAG, "childCount:" + getChildCount());
 
@@ -114,7 +118,7 @@ public class CustomScrollRefreshLayout extends ViewGroup {
             child = getChildAt(i);
             if (child.getVisibility() != View.GONE) {
                 int width = child.getMeasuredWidth();
-                if (mHeaderLayout == null) {
+                if (mHeaderLayout == null) {  //Check again!
                     addHeaderView();
                 }
                 if (child.getId() != mHeaderLayout.getId()) {
@@ -139,7 +143,7 @@ public class CustomScrollRefreshLayout extends ViewGroup {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return super.onInterceptTouchEvent(ev);
+        return true;
     }
 
     @Override
@@ -165,20 +169,41 @@ public class CustomScrollRefreshLayout extends ViewGroup {
                 yVelocity = mVelocityTracker.getYVelocity();
                 Log.d(TAG, "onTouchEvent() >> ACTION_MOVE, xVelocity:" + xVelocity + ", yVelocity:" + yVelocity);
 
-                if (xVelocity < yVelocity) {  //说明是上下滑动的手势
+                if (Math.abs(xVelocity) < Math.abs(yVelocity)) {  //说明是上下滑动的手势
                     yOffset = event.getY() - actionY;
-                    if (Math.abs(yOffset) > touchSlop) {  //超过系统设定距离，为滑动手势
+//                    if (Math.abs(yOffset) > touchSlop) {  //超过系统设定距离，为滑动手势
                         if (mHeaderLayout != null) {
                             requestLayout();  //刷新
                             invalidate();
                         }
-                    }
+//                    }
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 Log.d(TAG, "onTouchEvent() >> ACTION_UP");
                 //松开手指后
 
+                if (yOffset > 0) {  //当向下滑动时
+                    Log.e(TAG, "get back to top");
+                    //平滑的回到初始位置，有两种方法
+
+                    //Method 1:属性动画
+                    ValueAnimator objectAnimator = ValueAnimator.ofFloat(yOffset, 0f);
+                    objectAnimator.setTarget(this);
+                    objectAnimator.setDuration(500).start();
+                    objectAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener()
+                    {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation)
+                        {
+                            yOffset = (float) animation.getAnimatedValue();
+                            requestLayout();
+                            invalidate();
+                        }
+                    });
+
+                    //Method 2:Scroller
+                }
 
                 break;
             case MotionEvent.ACTION_CANCEL:
