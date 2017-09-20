@@ -22,6 +22,7 @@ public abstract class OnRecyclerViewScroller extends RecyclerView.OnScrollListen
      * 并且实现这个方法
      */
     public abstract void onLoadMore();
+    public abstract void onGetTop(boolean isTop);
 
     public void setCanLoad(boolean canLoad) {
         this.canLoad = canLoad;
@@ -41,6 +42,10 @@ public abstract class OnRecyclerViewScroller extends RecyclerView.OnScrollListen
 
         if (!recyclerView.canScrollVertically(1) && canLoad) { //滚动到底部
             onLoadMore();
+        }
+
+        if (!recyclerView.canScrollVertically(-1)) {
+            onGetTop(true);
         }
     }
 

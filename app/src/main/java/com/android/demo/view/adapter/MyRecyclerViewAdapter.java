@@ -76,7 +76,6 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     @Override
     public int getItemViewType(int position) {
-        Log.d(TAG, "getItemViewType, position:" + position + ", getItemCount:" + getItemCount());
         if (mLoadingLayout != null) {  //存在Loading View Item
             if (position == getItemCount() - 1) {
                 return ITEM_TYPE.LOADING.ordinal();

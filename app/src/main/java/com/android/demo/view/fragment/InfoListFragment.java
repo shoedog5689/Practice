@@ -106,6 +106,11 @@ public class InfoListFragment extends Fragment {
                 Timer timer = new Timer();
                 timer.schedule(timerTask, 2000);
             }
+
+            @Override
+            public void onGetTop(boolean isTop) {
+
+            }
         });
     }
 

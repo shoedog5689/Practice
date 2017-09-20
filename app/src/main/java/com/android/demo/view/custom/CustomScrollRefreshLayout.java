@@ -3,6 +3,7 @@ package com.android.demo.view.custom;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -66,7 +67,7 @@ public class CustomScrollRefreshLayout extends ViewGroup {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        Log.e(TAG, "onMeasure()");
+//        Log.e(TAG, "onMeasure()");
 
         /**
          * 处理WRAP_CONTENT
@@ -79,7 +80,7 @@ public class CustomScrollRefreshLayout extends ViewGroup {
 
 //        touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
 
-        Log.d(TAG, "childCount:" + getChildCount());
+//        Log.d(TAG, "childCount:" + getChildCount());
 
         measureChildren(widthMeasureSpec, heightMeasureSpec);
 
@@ -111,7 +112,7 @@ public class CustomScrollRefreshLayout extends ViewGroup {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         int childCount = getChildCount();
-        Log.d(TAG, "onLayout() >> childCount:" + childCount);
+//        Log.d(TAG, "onLayout() >> childCount:" + childCount);
         float totalVisibleHeight = 0; //除了headerView外的可视View的高度
         View child;
         for (int i = 0; i < childCount; i++) {
@@ -124,11 +125,11 @@ public class CustomScrollRefreshLayout extends ViewGroup {
                 if (child.getId() != mHeaderLayout.getId()) {
                     int height = child.getMeasuredHeight();
                     //可视高度加上Y轴偏移量来确定ViewGroup的位置
-                    Log.d(TAG, "onLayout() >> totalVisibleHeight:" + totalVisibleHeight + ", yOffset:" + yOffset);
+//                    Log.d(TAG, "onLayout() >> totalVisibleHeight:" + totalVisibleHeight + ", yOffset:" + yOffset);
                     child.layout(0, (int) (totalVisibleHeight + yOffset), width, (int) (totalVisibleHeight + height + yOffset));
                     totalVisibleHeight += height;
                 }else {
-                    Log.d(TAG, "onLayout() >> header view measured height:" + mHeaderLayout.getMeasuredHeight());
+//                    Log.d(TAG, "onLayout() >> header view measured height:" + mHeaderLayout.getMeasuredHeight());
 //                    child.layout(0, 0, width, (int) yOffset);  //仅布局一部分的方式
                     child.layout(0, (int) (yOffset - mHeaderLayout.getMeasuredHeight()), width, (int) yOffset);  //初始布局在顶部，随手势下移
                 }
@@ -137,15 +138,60 @@ public class CustomScrollRefreshLayout extends ViewGroup {
     }
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        return super.dispatchTouchEvent(ev);
+    public boolean onInterceptTouchEvent(MotionEvent event) {
+        Log.d(TAG, "onInterceptTouchEvent()");
+
+        if (mVelocityTracker == null) {
+            mVelocityTracker = VelocityTracker.obtain();
+        }
+        mVelocityTracker.addMovement(event);
+        mVelocityTracker.computeCurrentVelocity(1000);
+        float xVelocity;
+        float yVelocity;
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                Log.d(TAG, "onInterceptTouchEvent() >> ACTION_DOWN");
+                actionX = event.getX();  //初始位置
+                actionY = event.getY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                Log.e(TAG, "onInterceptTouchEvent() >> ACTION_MOVE");
+
+                xVelocity = mVelocityTracker.getXVelocity();
+                yVelocity = mVelocityTracker.getYVelocity();
+                Log.d(TAG, "onTouchEvent() >> ACTION_MOVE, xVelocity:" + xVelocity + ", yVelocity:" + yVelocity);
+
+                if (Math.abs(xVelocity) < Math.abs(yVelocity)) {  //说明是上下滑动的手势
+                    yOffset = event.getY() - actionY;
+                }
+
+                Log.e(TAG, "yOffset:" + yOffset);
+//                if () {
+//
+//                }
+                if (yOffset > 0) {  //向下滑动，拦截交给自己处理
+                    return true;
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                Log.d(TAG, "onInterceptTouchEvent() >> ACTION_UP");
+                break;
+            case MotionEvent.ACTION_CANCEL:
+                Log.d(TAG, "onInterceptTouchEvent() >> ACTION_CANCEL");
+                break;
+        }
+
+        return false;
     }
 
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return true;
-    }
-
+    /**
+     * 拦截了ACTION_MOVE之后，会走到onTouchEvent()中，这时需要重新计算move的距离然后重新布局才会生效，因为如果只在Interception中计算的话，
+     * 后续如果拦截了是不会再走到Intercepterion()中的
+     *
+     * @param event
+     * @return
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         Log.d(TAG, "onTouchEvent()");
@@ -161,55 +207,57 @@ public class CustomScrollRefreshLayout extends ViewGroup {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 Log.d(TAG, "onTouchEvent() >> ACTION_DOWN");
-                actionX = event.getX();  //初始位置
-                actionY = event.getY();
                 break;
             case MotionEvent.ACTION_MOVE:
+                Log.d(TAG, "onTouchEvent() >> ACTION_MOVE");
                 xVelocity = mVelocityTracker.getXVelocity();
                 yVelocity = mVelocityTracker.getYVelocity();
                 Log.d(TAG, "onTouchEvent() >> ACTION_MOVE, xVelocity:" + xVelocity + ", yVelocity:" + yVelocity);
 
                 if (Math.abs(xVelocity) < Math.abs(yVelocity)) {  //说明是上下滑动的手势
                     yOffset = event.getY() - actionY;
-//                    if (Math.abs(yOffset) > touchSlop) {  //超过系统设定距离，为滑动手势
-                        if (mHeaderLayout != null) {
-                            requestLayout();  //刷新
-                            invalidate();
-                        }
-//                    }
+                    if (mHeaderLayout != null && yOffset > 0) {
+                        requestLayout();  //刷新
+                        invalidate();
+                    }
                 }
-                break;
+                break; //消费
             case MotionEvent.ACTION_UP:
                 Log.d(TAG, "onTouchEvent() >> ACTION_UP");
                 //松开手指后
 
                 if (yOffset > 0) {  //当向下滑动时
-                    Log.e(TAG, "get back to top");
-                    //平滑的回到初始位置，有两种方法
-
-                    //Method 1:属性动画
-                    ValueAnimator objectAnimator = ValueAnimator.ofFloat(yOffset, 0f);
-                    objectAnimator.setTarget(this);
-                    objectAnimator.setDuration(500).start();
-                    objectAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener()
-                    {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animation)
-                        {
-                            yOffset = (float) animation.getAnimatedValue();
-                            requestLayout();
-                            invalidate();
-                        }
-                    });
-
-                    //Method 2:Scroller
+                    resetViewToTop();
+                    return true;
                 }
-
                 break;
             case MotionEvent.ACTION_CANCEL:
                 Log.d(TAG, "onTouchEvent() >> ACTION_CANCEL");
                 break;
         }
+
         return true;
+    }
+
+    private void resetViewToTop() {
+        Log.e(TAG, "get back to top");
+        //平滑的回到初始位置，有两种方法
+
+        //Method 1:属性动画
+        ValueAnimator objectAnimator = ValueAnimator.ofFloat(yOffset, 0f);
+        objectAnimator.setTarget(this);
+        objectAnimator.setDuration(500).start();
+        objectAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener()
+        {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation)
+            {
+                yOffset = (float) animation.getAnimatedValue();
+                requestLayout();
+                invalidate();
+            }
+        });
+
+        //Method 2:Scroller
     }
 }
