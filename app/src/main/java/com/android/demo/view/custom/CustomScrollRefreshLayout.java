@@ -3,6 +3,7 @@ package com.android.demo.view.custom;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -27,6 +28,8 @@ public class CustomScrollRefreshLayout extends ViewGroup {
     private LinearLayout mHeaderLayout;
     private VelocityTracker mVelocityTracker;
 //    private int touchSlop;
+
+    private View scrolledChild;
 
     private float headerViewHeight;
     private float yOffset; //Y轴偏移量
@@ -58,7 +61,7 @@ public class CustomScrollRefreshLayout extends ViewGroup {
                 lp = new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, (int) headerViewHeight);
             }
 //            mHeaderLayout.setY(-headerViewHeight);  //设置初始位置，不可见
-            addView(mHeaderLayout, 0, lp);  //添加到布局中，但其实此时不可见
+            addView(mHeaderLayout, 0, lp);  //添加到布局中，但其实此时不可见，因为还未开始布局呢~~~
             mHeaderLayout.bringToFront();  //改变在同一层级的控件中的z轴的顺序，放到最上层
         }
     }
@@ -115,6 +118,9 @@ public class CustomScrollRefreshLayout extends ViewGroup {
 //        Log.d(TAG, "onLayout() >> childCount:" + childCount);
         float totalVisibleHeight = 0; //除了headerView外的可视View的高度
         View child;
+        if(getChildCount() > 1) {  //获取HeaderView下的第一个view
+            scrolledChild = getChildAt(1);
+        }
         for (int i = 0; i < childCount; i++) {
             child = getChildAt(i);
             if (child.getVisibility() != View.GONE) {
@@ -167,11 +173,10 @@ public class CustomScrollRefreshLayout extends ViewGroup {
                 }
 
                 Log.e(TAG, "yOffset:" + yOffset);
-//                if () {
-//
-//                }
-                if (yOffset > 0) {  //向下滑动，拦截交给自己处理
-                    return true;
+                if (scrolledChild != null) {
+                    if (yOffset > 0 && !scrolledChild.canScrollVertically(-1)) {  //向下滑动，拦截交给自己处理，这里的判断条件是有向下的偏移量且scrolledChild本身不可以向下滑动了
+                        return true;
+                    }
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -237,6 +242,23 @@ public class CustomScrollRefreshLayout extends ViewGroup {
         }
 
         return true;
+    }
+
+    @Override
+    public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+        Log.e(TAG, "requestDisallowInterceptTouchEvent(), instanceof:" + (getChildAt(1) instanceof RecyclerView));
+        // if this is a List < L or another view that doesn't support nested
+        // scrolling, ignore this request so that the vertical scroll event
+        // isn't stolen
+        Log.e(TAG, "NestedScrollingEnabled:" + ViewCompat.isNestedScrollingEnabled(getChildAt(1)));
+        if ((android.os.Build.VERSION.SDK_INT < 21 && getChildAt(1) instanceof RecyclerView)
+                || (getChildAt(1) != null && !ViewCompat.isNestedScrollingEnabled(getChildAt(1)))) {
+            Log.e(TAG, "requestDisallowInterceptTouchEvent()  >> 1");
+            // Nope.
+        } else {
+            Log.e(TAG, "requestDisallowInterceptTouchEvent()  >> 2");
+            super.requestDisallowInterceptTouchEvent(disallowIntercept);
+        }
     }
 
     private void resetViewToTop() {
