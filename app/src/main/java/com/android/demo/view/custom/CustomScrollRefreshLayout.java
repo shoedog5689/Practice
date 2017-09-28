@@ -3,6 +3,7 @@ package com.android.demo.view.custom;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.os.Build;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -14,6 +15,7 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.LinearLayout;
 
 import com.android.demo.R;
@@ -147,35 +149,22 @@ public class CustomScrollRefreshLayout extends ViewGroup {
     public boolean onInterceptTouchEvent(MotionEvent event) {
         Log.d(TAG, "onInterceptTouchEvent()");
 
-        if (mVelocityTracker == null) {
-            mVelocityTracker = VelocityTracker.obtain();
-        }
-        mVelocityTracker.addMovement(event);
-        mVelocityTracker.computeCurrentVelocity(1000);
-        float xVelocity;
-        float yVelocity;
-
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                Log.d(TAG, "onInterceptTouchEvent() >> ACTION_DOWN");
-                actionX = event.getX();  //初始位置
+                actionX = event.getX();
                 actionY = event.getY();
                 break;
             case MotionEvent.ACTION_MOVE:
                 Log.e(TAG, "onInterceptTouchEvent() >> ACTION_MOVE");
-
-                xVelocity = mVelocityTracker.getXVelocity();
-                yVelocity = mVelocityTracker.getYVelocity();
-                Log.d(TAG, "onTouchEvent() >> ACTION_MOVE, xVelocity:" + xVelocity + ", yVelocity:" + yVelocity);
-
-                if (Math.abs(xVelocity) < Math.abs(yVelocity)) {  //说明是上下滑动的手势
-                    yOffset = event.getY() - actionY;
-                }
-
-                Log.e(TAG, "yOffset:" + yOffset);
                 if (scrolledChild != null) {
-                    if (yOffset > 0 && !scrolledChild.canScrollVertically(-1)) {  //向下滑动，拦截交给自己处理，这里的判断条件是有向下的偏移量且scrolledChild本身不可以向下滑动了
-                        return true;
+                    if (event.getY() > actionY) {   //向下滚
+//                        if (!scrolledChild.canScrollVertically(-1)) {  //向下滑动，拦截交给自己处理，这里的判断条件是有向下的偏移量且scrolledChild本身不可以向下滑动了
+//                            return true;
+//                        }
+                        Log.e(TAG, "canScrollDown():" + canScrollDown(scrolledChild));
+                        if (!canScrollDown(scrolledChild)) {
+                            return true;
+                        }
                     }
                 }
                 break;
@@ -244,23 +233,6 @@ public class CustomScrollRefreshLayout extends ViewGroup {
         return true;
     }
 
-    @Override
-    public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-        Log.e(TAG, "requestDisallowInterceptTouchEvent(), instanceof:" + (getChildAt(1) instanceof RecyclerView));
-        // if this is a List < L or another view that doesn't support nested
-        // scrolling, ignore this request so that the vertical scroll event
-        // isn't stolen
-        Log.e(TAG, "NestedScrollingEnabled:" + ViewCompat.isNestedScrollingEnabled(getChildAt(1)));
-        if ((android.os.Build.VERSION.SDK_INT < 21 && getChildAt(1) instanceof RecyclerView)
-                || (getChildAt(1) != null && !ViewCompat.isNestedScrollingEnabled(getChildAt(1)))) {
-            Log.e(TAG, "requestDisallowInterceptTouchEvent()  >> 1");
-            // Nope.
-        } else {
-            Log.e(TAG, "requestDisallowInterceptTouchEvent()  >> 2");
-            super.requestDisallowInterceptTouchEvent(disallowIntercept);
-        }
-    }
-
     private void resetViewToTop() {
         Log.e(TAG, "get back to top");
         //平滑的回到初始位置，有两种方法
@@ -281,5 +253,21 @@ public class CustomScrollRefreshLayout extends ViewGroup {
         });
 
         //Method 2:Scroller
+    }
+
+    //能否下拉
+    private boolean canScrollDown(View view) {
+        if (view == null) {
+            return false;
+        }
+        return view.canScrollVertically(-1);
+    }
+
+    //能否上拉
+    private boolean canScrollUp(View view) {
+        if (view == null) {
+            return false;
+        }
+        return view.canScrollVertically(1);
     }
 }
